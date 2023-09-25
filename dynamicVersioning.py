@@ -48,21 +48,28 @@ def image_versioning():
             vr.write(str(formatted_tag))
 
         # Open the versioned_image_file.txt for writing
-        with open(versioned_image_file, "w") as vf:
-            # Write versioned_image values to the file line by line
-            print("Writing Versioned Images to versioned_image_file.txt:")
-            for part in extracted_parts:
-                image_name = part
-                image_tag = formatted_tag
-                versioned_image = f'harbor1.akillisebeke.lab/scada-botas/{image_name}:{image_tag}'
-                tag_image_command = ["docker", "tag", line, versioned_image]
-                vf.write(versioned_image + "\n")
-                print(versioned_image)  # Print for verification
+            with open(versioned_image_file, "w") as vf:
+                # Write versioned_image values to the file line by line
+                print("Writing Versioned Images to versioned_image_file.txt:")
+                for part in extracted_parts:
+                    image_name = part
+                    image_tag = formatted_tag
+                    versioned_image = f'harbor1.akillisebeke.lab/scada-botas/{image_name}:{image_tag}'
+                    tag_image_command = ["docker", "tag", line, versioned_image]
+                    vf.write(versioned_image + "\n")
+                    print(versioned_image)  # Print for verification
 
-        print("Updated Tag Value:")
-        print(formatted_tag)
+                    # Tag the Docker image
+                    subprocess.run(tag_image_command)
 
-    except FileNotFoundError:
+                    # Push the tagged image to a Docker registry
+                    push_image_command = ["docker", "push", versioned_image]
+                    subprocess.run(push_image_command)
+
+            print("Updated Tag Value:")
+            print(formatted_tag)
+
+        except FileNotFoundError:
         print(f"The file '{docker_file_name}' or '{version}' was not found.")
     except IOError as e:
         print(f"An error occurred while reading or writing the file: {e}")
